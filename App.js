@@ -1,33 +1,34 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { FlatList, StyleSheet, Button, View } from 'react-native';
+import GoalInput from './components/GoalInput';
+import GoalItem from './components/GoalItem';
 
 export default function App() {
-  const [enteredGoal, setEnteredGoal] = useState('');
   const [courseGoals, setCourseGoals] = useState([]);
-
-  const goalInputHandler = (enteredText) => {
-    setEnteredGoal(enteredText);
-  };
-
+  const [isAddMode, setIsAddMode] = useState(false);
   const addGoalHandler = () => {
-    setCourseGoals([...courseGoals]);
+    setCourseGoals((currentGoals) => [
+      ...currentGoals,
+      { key: Math.random().toString(), value: goalTitle },
+    ]);
+    setIsAddMode(false);
   };
-
+  const cancelGoal = () => {
+    setIsAddMode(false);
+  };
   return (
     <View style={styles.screen}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder='Course Goal'
-          style={styles.input}
-          onChangeText={goalInputHandler}
-          value={enteredGoal}
-        />
-        <Button title='Add' onPress={addGoalHandler} />
-      </View>
-      <View>
-        <Text>{enteredGoal}</Text>
-      </View>
+      <Button onPress={() => setIsAddMode(true)} title='Add New Goal' />
+      <GoalInput
+        onCancel={cancelGoal}
+        isAddMode={isAddMode}
+        addGoalHandler={addGoalHandler}
+      />
+      <FlatList
+        keyExtractor={(item, index) => item.id}
+        data={courseGoals}
+        renderItems={(itemData) => <GoalItem title={itemData.item.value} />}
+      />
     </View>
   );
 }
@@ -35,16 +36,5 @@ export default function App() {
 const styles = StyleSheet.create({
   screen: {
     padding: 50,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  input: {
-    width: '80%',
-    borderColor: 'black',
-    borderWidth: 1,
-    padding: 10,
   },
 });
